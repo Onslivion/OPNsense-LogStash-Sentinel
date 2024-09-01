@@ -1,5 +1,5 @@
 # OPNsense --> LogStash --> DCR --> Microsoft Sentinel / Log Analytics
-This is heavily based on [Truvis Thorton's implementation](https://github.com/Truvis/Sentinel/tree/main). There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the fields removed (they've been commented out) and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for these pruned elements).
+This is heavily based on [Truvis Thorton's implementation](https://github.com/Truvis/Sentinel/tree/main); credits to them for their efforts. There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the fields removed (they've been commented out) and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for these pruned elements).
 
 ## Prerequisites
 - An instance of Debian/Linux (ensure it's up to date via APT).
