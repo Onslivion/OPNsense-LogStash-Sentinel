@@ -1,6 +1,8 @@
 # OPNsense --> LogStash --> DCR --> Microsoft Sentinel / Log Analytics
 This is heavily based on [Truvis Thorton's implementation](https://github.com/Truvis/Sentinel/tree/main), which may have derived from [noodlemctwoodle's pf-azure-sentinel](https://github.com/noodlemctwoodle/pf-azure-sentinel); credits to them for their efforts. 
+
 There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the fields removed (they've been commented out) and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for these pruned elements).
+
 Additionally, these implementations utilize the now legacy HTTP Collector APIs from Log Analytics. I've modified 50-output.conf to instead use the DCR-based (Data Collection Rule) APIs that intend to supersede the legacy APIs.
 
 ## Prerequisites
