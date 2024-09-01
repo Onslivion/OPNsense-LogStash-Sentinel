@@ -2,7 +2,7 @@
 ## Introduction
 This is heavily based on [Truvis Thorton's implementation](https://github.com/Truvis/Sentinel/tree/main), which may have derived from [noodlemctwoodle's pf-azure-sentinel](https://github.com/noodlemctwoodle/pf-azure-sentinel); credits to them for their efforts. 
 
-There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the fields removed (they've been commented out) and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for these pruned elements).
+There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the removed fields and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for removed / pruned elements).
 
 Additionally, these implementations utilize the now legacy HTTP Collector APIs from Log Analytics. I've modified 50-output.conf to instead use the DCR-based (Data Collection Rule) APIs that intend to supersede the legacy APIs.
 
@@ -14,7 +14,7 @@ Additionally, these implementations utilize the now legacy HTTP Collector APIs f
 ## Installation
 
 ### LogStash
-1. Install an OpenJDK runtime (preferably headless). At the current time, I have used OpenJDK JRE 17.
+1. Install an OpenJDK runtime (preferably headless). I will be using OpenJDK JRE 17.
 ```
 sudo apt install openjdk-17-jre-headless
 ```
@@ -50,15 +50,15 @@ I manually flattened all nested entries using 47-flatten.conf to be most compati
 
 The following instructions will align mostly with the instructions provided here: [Tutorial: Send data to Azure Monitor Logs with Logs ingestion API (Azure portal)](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-logs-ingestion-portal#create-new-table-in-log-analytics-workspace)
 
-0. Create an Entra app registration and a data collection endpoint (although optional, might as well be consistent until Azure updates their documentation and UI).
-   Observe the configuration in 50-output.conf. 
+0. Create an Entra app registration and a data collection endpoint (Microsoft states a DCE is optional, I still created a DCE anyways).
+   Observe the configuration in 50-output.conf.
 
 1. Initiate LogStash once. This will generate an example file in /tmp/.
 ```
 sudo systemctl start logstash
 ```
 
-3. Create a new DCR-based table in the Log Analytics workspace per the above guide. Use the json file placed in /tmp/ to generate the table.
+3. Create a new DCR-based table in the Log Analytics workspace [per the Microsoft guide](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-logs-ingestion-portal#create-new-table-in-log-analytics-workspace). Use the json file placed in /tmp/ to generate the table.
 
 4. When prompted to make a TimeGenerated entry, I recommend using the following query. This query will make the LogStash generation timestamp the TimeGenerated field (and remove the now duplicate).
 
@@ -68,9 +68,9 @@ source
 | project-away ls_timestamp
 ```
 
-4. Finalize the creation of the table, then navigate to the newly created Data Collection Rule made by the table.
+4. Finalize the creation of the table, then navigate to the newly created Data Collection Rule in the Azure portal.
 
-5. Assign the app registration the appropriate permissions [per the guide]("https://learn.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-logs-ingestion-portal#assign-permissions-to-the-dcr"). This change may take a minute to propogate - you may experience 403 errors.
+5. Assign the app registration the appropriate permissions [per the Microsoft guide]("https://learn.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-logs-ingestion-portal#assign-permissions-to-the-dcr"). This change may take a while to propogate - you may experience 403 errors.
   
 6. Take the "Immutable Id" field and paste it into the "dcr_immutable_id" field (50-output.conf).
 
@@ -80,7 +80,21 @@ source
 
 9. Gather app ID, app secret, and tenant ID information from the Entra app registration created earlier. Paste them into "client_app_Id", "client_app_secret", and "tenant_id" respectively.
 
-10. Uncomment the fields and comment the sample_file related parameters in 50-output.conf.
+10. Uncomment the commented fields and comment the sample_file related parameters in 50-output.conf.
+```
+output {
+  microsoft-sentinel-log-analytics-logstash-output-plugin {
+      client_app_Id => "<your app id>"
+      client_app_secret => "<your app secret>"
+      tenant_id => "<your tenant (directory) id>"
+      data_collection_endpoint => "<your DCE URI from the Data Collection Endpoint overview page>"
+      dcr_immutable_id => "<your immutable ID from the DCR overview page>"
+      dcr_stream_name => "<the value from your DCR > Data sources first entry>"
+#      create_sample_file => true
+#      sample_file_path => "/tmp/"
+    }
+}
+```
 
 11. Restart LogStash.
 ```
