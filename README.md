@@ -1,4 +1,5 @@
 # OPNsense --> LogStash --> DCR --> Microsoft Sentinel / Log Analytics
+## Introduction
 This is heavily based on [Truvis Thorton's implementation](https://github.com/Truvis/Sentinel/tree/main), which may have derived from [noodlemctwoodle's pf-azure-sentinel](https://github.com/noodlemctwoodle/pf-azure-sentinel); credits to them for their efforts. 
 
 There were fields I cleaned up a bit or removed to reduce the amount of data sent to Azure. I would recommend reviewing the fields removed (they've been commented out) and see if they apply to your needs (check the 03-filter.conf and 45-prune.conf files for these pruned elements).
@@ -43,7 +44,7 @@ if [interface] =~ /^**ovpnc1**$/ <change ** ** to interfaces on your firewall> {
 ```
 
 ### Log Analytics Table Configuration
-The [microsoft-sentinel-log-analytics-logstash-output-plugin](https://github.com/Azure/Azure-Sentinel/tree/master/DataConnectors/microsoft-sentinel-log-analytics-logstash-output-plugin) uses the DCR-based (Data Collection Rule) APIs. This plugin is currently in public preview. There is also a way to utilize the legacy-based HTTP Collector APIs instead if you prefer (see [Introduction](https://github.com/Onslivion/OPNsense-LogStash-Sentinel#Introduction).
+The [microsoft-sentinel-log-analytics-logstash-output-plugin](https://github.com/Azure/Azure-Sentinel/tree/master/DataConnectors/microsoft-sentinel-log-analytics-logstash-output-plugin) uses the DCR-based (Data Collection Rule) APIs. This plugin is currently in public preview. There is also a way to utilize the legacy-based HTTP Collector APIs instead if you prefer (see [Introduction](https://github.com/Onslivion/OPNsense-LogStash-Sentinel#Introduction)).
 
 I manually flattened all nested entries using 47-flatten.conf to be most compatible / readable in Azure. 
 
